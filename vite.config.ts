@@ -16,4 +16,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, './src'),
     },
   },
+  server: {
+    proxy: {
+      '/api/splitwise': {
+        target: 'https://secure.splitwise.com/api/v3.0',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/splitwise/, ''),
+      },
+    },
+  },
 })
