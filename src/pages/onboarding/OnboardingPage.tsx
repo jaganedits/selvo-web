@@ -48,7 +48,7 @@ export default function OnboardingPage() {
               <p className="font-medium text-foreground text-[13px]">Why your own Firebase?</p>
               <p className="mt-1 text-[12px]">Your financial data stays in your own cloud project. You own it, you control it.</p>
             </div>
-            <Button onClick={() => setStep('setup')} className="w-full h-10 bg-brand hover:bg-brand-light">
+            <Button onClick={() => setStep('setup')} size="lg" className="w-full bg-brand hover:bg-brand-light">
               Set up Firebase <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </CardContent>

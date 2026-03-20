@@ -34,7 +34,7 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center p-6">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1 text-center">
-          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand">
+          <div className="mx-auto mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-brand">
             <span className="font-heading text-xl font-bold text-white">S</span>
           </div>
           <CardTitle className="font-heading text-2xl">Create account</CardTitle>

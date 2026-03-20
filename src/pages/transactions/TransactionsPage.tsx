@@ -152,7 +152,7 @@ export default function TransactionsPage() {
         </div>
         <div className="flex items-center gap-2">
           <MonthPicker monthKey={monthKey} onChange={setMonthKey} />
-          <Button onClick={() => navigate(ROUTES.TRANSACTION_FORM)} size="sm" className="h-8 rounded-lg bg-brand text-xs hover:bg-brand-light">
+          <Button onClick={() => navigate(ROUTES.TRANSACTION_FORM)} size="sm" className="bg-brand hover:bg-brand-light">
             <Plus className="mr-1 h-3.5 w-3.5" />Add
           </Button>
         </div>
@@ -190,7 +190,7 @@ export default function TransactionsPage() {
           icon={<ReceiptText className="h-5 w-5 text-muted-foreground" />}
           title="No transactions"
           description={globalFilter ? 'Try a different search' : 'Add your first transaction'}
-          action={<Button size="sm" className="h-8 rounded-lg bg-brand text-xs hover:bg-brand-light" onClick={() => navigate(ROUTES.TRANSACTION_FORM)}><Plus className="mr-1 h-3 w-3" />Add</Button>}
+          action={<Button size="sm" className="bg-brand hover:bg-brand-light" onClick={() => navigate(ROUTES.TRANSACTION_FORM)}><Plus className="mr-1 h-3 w-3" />Add</Button>}
         />
       ) : (
         <Card className="border-border/50 shadow-sm overflow-hidden">

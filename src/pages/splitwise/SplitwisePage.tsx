@@ -19,15 +19,10 @@ import { cn } from '@/lib/utils.ts'
 import { toast } from 'sonner'
 import { formatIndianAmount } from '@/lib/date.ts'
 import { Key, Loader2, Download, UserCircle, Unplug, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import splitwiseLogo from '@/assets/splitwise-logo.svg'
 
-// Splitwise logo
 function SplitwiseLogo({ className }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" className={className} fill="none">
-      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="#5BC5A7" />
-      <path d="M15.5 8.5l-3 3.5-3-3.5M8.5 11.5l3 3.5 3-3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  )
+  return <img src={splitwiseLogo} alt="Splitwise" className={className} />
 }
 
 export default function SplitwisePage() {
@@ -134,9 +129,8 @@ export default function SplitwisePage() {
   // Not connected — show connect form
   if (!connected) {
     return (
-      <div className="space-y-3 animate-fade-up">
-        <h1 className="font-heading text-lg font-extrabold tracking-tight">Splitwise</h1>
-        <Card className="mx-auto max-w-sm border-border/50 shadow-sm">
+      <div className="flex min-h-[60vh] flex-col items-center justify-center animate-fade-up">
+        <Card className="w-full max-w-sm border-border/50 shadow-sm">
           <CardContent className="p-4">
             <div className="mb-3 flex items-center gap-2">
               <SplitwiseLogo className="h-6 w-6" />
@@ -151,7 +145,7 @@ export default function SplitwisePage() {
                 <Input type="password" placeholder="Your Splitwise API key" value={apiKey} onChange={e => setApiKey(e.target.value)} className="h-9 rounded-lg text-xs font-mono" />
               </div>
               <p className="text-[10px] text-muted-foreground">Get your API key from Splitwise Developer settings</p>
-              <Button size="sm" className="h-8 w-full rounded-lg bg-[#5BC5A7] text-xs font-semibold hover:bg-[#4ab396]" onClick={handleConnect} disabled={connecting}>
+              <Button size="sm" className="w-full bg-[#5BC5A7] hover:bg-[#4ab396]" onClick={handleConnect} disabled={connecting}>
                 {connecting ? <Loader2 className="mr-1 h-3 w-3 animate-spin" /> : <Key className="mr-1 h-3 w-3" />}
                 Connect
               </Button>
@@ -171,7 +165,7 @@ export default function SplitwisePage() {
           <h1 className="font-heading text-lg font-extrabold tracking-tight">Splitwise</h1>
           {currentUser && <Badge variant="secondary" className="text-[9px]">{currentUser.first_name}</Badge>}
         </div>
-        <Button variant="outline" size="sm" className="h-7 rounded-md text-[11px]" onClick={handleDisconnect}>
+        <Button variant="outline" size="sm" className="" onClick={handleDisconnect}>
           <Unplug className="mr-1 h-3 w-3" />Disconnect
         </Button>
       </div>
@@ -218,7 +212,7 @@ export default function SplitwisePage() {
             <div className="mb-2 flex items-center justify-between">
               <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">Recent Expenses ({expenses.length})</p>
               {expenses.some(e => !importedIds.has(e.splitwiseId)) && (
-                <Button size="sm" className="h-7 rounded-md bg-[#5BC5A7] text-[10px] hover:bg-[#4ab396]" onClick={handleImportAll}>
+                <Button size="sm" className="bg-[#5BC5A7] hover:bg-[#4ab396]" onClick={handleImportAll}>
                   <Download className="mr-1 h-3 w-3" />Import All
                 </Button>
               )}
@@ -257,7 +251,7 @@ export default function SplitwisePage() {
                               {isImported ? (
                                 <Badge variant="secondary" className="text-[9px] bg-income/10 text-income">Imported</Badge>
                               ) : (
-                                <Button size="sm" variant="outline" className="h-6 rounded-md text-[10px] px-2"
+                                <Button size="sm" variant="outline" className=""
                                   onClick={() => handleImport(e)} disabled={importing === e.splitwiseId}
                                 >
                                   {importing === e.splitwiseId ? <Loader2 className="h-3 w-3 animate-spin" /> : <Download className="mr-0.5 h-3 w-3" />}

@@ -103,10 +103,13 @@
   --sidebar-accent-foreground: oklch(0.25 0.01 50);
   --sidebar-border: oklch(0.915 0.005 60);
   --sidebar-ring: oklch(0.52 0.18 30);
+
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: oklch(0.8 0.005 60);
+  --scrollbar-thumb-hover: oklch(0.65 0.01 50);
 }
 
 .dark {
-  /* Mobile app colors: surfaceDark=#1E1E1E, cardDark=#2A2A2A */
   --background: #1E1E1E;
   --foreground: #F0F0F0;
   --card: #2A2A2A;
@@ -138,9 +141,64 @@
   --sidebar-accent-foreground: #E8E8E8;
   --sidebar-border: #3A3A3A;
   --sidebar-ring: #FF6B2C;
+
+  --scrollbar-track: transparent;
+  --scrollbar-thumb: #444;
+  --scrollbar-thumb-hover: #666;
 }
 
-/* ── Animations ── */
+/* ═══════════════════════════════════════════
+   CUSTOM SCROLLBAR
+   Thin, elegant scrollbar that blends with theme
+   ═══════════════════════════════════════════ */
+
+/* Webkit (Chrome, Safari, Edge) */
+*::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Only show scrollbar on hover for non-main containers */
+*::-webkit-scrollbar-thumb {
+  background: transparent;
+}
+
+*:hover::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
+
+*:hover::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+/* Main scroll area always shows */
+main::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATIONS & TRANSITIONS
+   ═══════════════════════════════════════════ */
 
 @keyframes fade-up {
   from { opacity: 0; transform: translateY(12px); }
@@ -210,46 +268,43 @@
 .stagger-children > *:nth-child(7) { animation-delay: 360ms; }
 .stagger-children > *:nth-child(8) { animation-delay: 420ms; }
 
-/* Noise texture overlay */
-.noise-bg::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-  pointer-events: none;
-  opacity: 0.025;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-repeat: repeat;
-  background-size: 256px 256px;
+/* ═══════════════════════════════════════════
+   GLOBAL POLISH
+   ═══════════════════════════════════════════ */
+
+/* Smooth scroll everywhere */
+html {
+  scroll-behavior: smooth;
 }
 
-.dark .noise-bg::before {
-  opacity: 0.04;
+/* Hide number input spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] {
+  -moz-appearance: textfield;
 }
 
-/* Financial number styling */
+/* Financial numbers */
 .tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
-/* Card with left accent border */
-.card-accent-left {
-  border-left: 3px solid var(--color-brand);
-}
+/* ═══════════════════════════════════════════
+   CARD ACCENT BORDERS
+   ═══════════════════════════════════════════ */
 
-.card-accent-income {
-  border-left: 3px solid var(--color-income);
-}
+.card-accent-left   { border-left: 3px solid var(--color-brand); }
+.card-accent-income { border-left: 3px solid var(--color-income); }
+.card-accent-expense{ border-left: 3px solid var(--color-expense); }
+.card-accent-budget { border-left: 3px solid var(--color-budget); }
 
-.card-accent-expense {
-  border-left: 3px solid var(--color-expense);
-}
+/* ═══════════════════════════════════════════
+   DECORATIVE PATTERNS
+   ═══════════════════════════════════════════ */
 
-.card-accent-budget {
-  border-left: 3px solid var(--color-budget);
-}
-
-/* Geometric pattern for login */
 .geo-pattern {
   background-image:
     radial-gradient(circle at 20% 80%, rgba(255,255,255,0.08) 0%, transparent 50%),
@@ -257,7 +312,6 @@
     linear-gradient(135deg, transparent 40%, rgba(255,255,255,0.03) 40%, rgba(255,255,255,0.03) 60%, transparent 60%);
 }
 
-/* Glass effect */
 .glass {
   background: rgba(255, 255, 255, 0.08);
   backdrop-filter: blur(12px);
@@ -265,15 +319,167 @@
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
+/* ═══════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════ */
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground font-body antialiased;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
+
   h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading);
     letter-spacing: -0.02em;
   }
+
+  /* Smooth transitions on interactive elements */
+  a, button, input, select, textarea,
+  [role="button"], [tabindex] {
+    transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Better focus ring for all focusable elements */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Remove focus ring for mouse clicks */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Selection color */
+  ::selection {
+    background: oklch(0.52 0.18 30 / 0.2);
+    color: inherit;
+  }
+
+  .dark ::selection {
+    background: rgba(255, 107, 44, 0.25);
+  }
+
+  /* Placeholder styling */
+  ::placeholder {
+    color: var(--muted-foreground);
+    opacity: 0.5;
+  }
+
+  /* Disabled state consistency */
+  [disabled], .disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  /* Link hover */
+  a:not([class]) {
+    color: var(--color-brand);
+    text-decoration-color: transparent;
+    transition: text-decoration-color 0.2s;
+  }
+
+  a:not([class]):hover {
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   COMPONENT MICRO-INTERACTIONS
+   ═══════════════════════════════════════════ */
+
+/* Cards — subtle lift on hover */
+[data-slot="card"] {
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+[data-slot="card"]:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.dark [data-slot="card"]:hover {
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Buttons — subtle press effect already via active:translate-y-px */
+
+/* Inputs — glow on focus */
+[data-slot="input"]:focus,
+[data-slot="select-trigger"]:focus-within {
+  box-shadow: 0 0 0 3px oklch(0.52 0.18 30 / 0.08);
+}
+
+.dark [data-slot="input"]:focus,
+.dark [data-slot="select-trigger"]:focus-within {
+  box-shadow: 0 0 0 3px rgba(255, 107, 44, 0.12);
+}
+
+/* Badge — no transition jank */
+[data-slot="badge"] {
+  transition: none;
+}
+
+/* Table rows — smooth hover */
+[data-slot="table-row"] {
+  transition: background-color 0.15s ease;
+}
+
+/* Dialog/Sheet — smooth backdrop */
+[data-slot="dialog-overlay"],
+[data-slot="sheet-overlay"] {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Sidebar nav items — smooth transitions */
+[data-slot="sidebar-menu-button"] {
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+/* Skeleton shimmer */
+[data-slot="skeleton"] {
+  animation: shimmer 2s ease-in-out infinite;
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    oklch(0.92 0.005 60) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.dark [data-slot="skeleton"] {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    #404040 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+}
+
+/* Progress bars — smooth width transitions */
+.card-accent-income + div .h-2,
+.card-accent-income + div .h-1\.5,
+[class*="h-2"][class*="rounded-full"],
+[class*="h-1.5"][class*="rounded-full"] {
+  transition: width 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Toast styling */
+[data-sonner-toaster] [data-sonner-toast] {
+  border-radius: var(--radius-lg) !important;
+  font-family: var(--font-body) !important;
 }

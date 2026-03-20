@@ -1,5 +1,8 @@
-import { useState, type FormEvent } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
@@ -15,17 +18,31 @@ import { toast } from 'sonner'
 import { cn } from '@/lib/utils.ts'
 import { Loader2, ArrowLeft } from 'lucide-react'
 
+const schema = z.object({
+  amount: z.string().min(1, 'Required').refine(v => parseFloat(v) > 0, 'Must be > 0'),
+  name: z.string().min(1, 'Required'),
+  note: z.string().optional(),
+})
+
+type FormData = z.infer<typeof schema>
+
+function FieldError({ message }: { message?: string }) {
+  return <p className={cn('h-4 text-[10px] text-destructive', !message && 'invisible')}>{message || ' '}</p>
+}
+
 export default function TransactionFormPage() {
   const navigate = useNavigate()
   const { db, uid } = useSecondaryFirebase()
   const [loading, setLoading] = useState(false)
   const [type, setType] = useState<'expense' | 'income'>('expense')
-  const [amount, setAmount] = useState('')
-  const [name, setName] = useState('')
   const [category, setCategory] = useState(DEFAULT_EXPENSE_CATEGORIES[0]!.name)
   const [date, setDate] = useState(new Date())
   const [paymentMode, setPaymentMode] = useState<string>(PAYMENT_MODES[0]!)
-  const [note, setNote] = useState('')
+
+  const { register, handleSubmit, formState: { errors } } = useForm<FormData>({
+    resolver: zodResolver(schema),
+    defaultValues: { amount: '', name: '', note: '' },
+  })
 
   const categories = type === 'expense' ? DEFAULT_EXPENSE_CATEGORIES : DEFAULT_INCOME_CATEGORIES
 
@@ -35,14 +52,12 @@ export default function TransactionFormPage() {
     setCategory(cats[0]!.name)
   }
 
-  async function handleSubmit(e: FormEvent) {
-    e.preventDefault()
-    if (!amount || !name) return
+  async function onSubmit(data: FormData) {
     setLoading(true)
     try {
       await addTransaction(db, uid, {
-        type, amount: parseFloat(amount), category, name,
-        date: Timestamp.fromDate(date), note, paymentMode,
+        type, amount: parseFloat(data.amount), category, name: data.name,
+        date: Timestamp.fromDate(date), note: data.note ?? '', paymentMode,
       })
       toast.success('Transaction added')
       navigate(ROUTES.TRANSACTIONS, { replace: true })
@@ -64,16 +79,16 @@ export default function TransactionFormPage() {
 
       <Card className="border-border/50 shadow-sm">
         <CardContent className="p-4">
-          <form onSubmit={handleSubmit} className="space-y-3">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-1">
             {/* Row 1: Type + Amount */}
-            <div className="grid gap-3 sm:grid-cols-[180px_1fr]">
-              <div className="space-y-1">
+            <div className="grid items-start grid-cols-[200px_1fr] gap-3">
+              <div>
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Type</Label>
-                <div className="grid grid-cols-2 gap-1 rounded-lg bg-secondary/60 p-0.5">
+                <div className="mt-1 grid grid-cols-2 gap-1 rounded-lg bg-secondary/60 p-0.5">
                   {(['expense', 'income'] as const).map(t => (
                     <Button key={t} type="button" variant="ghost" size="sm"
                       onClick={() => handleTypeChange(t)}
-                      className={cn('h-8 rounded-md text-xs font-bold capitalize',
+                      className={cn('h-9 rounded-md text-xs font-bold capitalize',
                         type === t ? t === 'expense'
                           ? 'bg-expense text-white shadow-sm hover:bg-expense hover:text-white'
                           : 'bg-income text-white shadow-sm hover:bg-income hover:text-white'
@@ -82,72 +97,86 @@ export default function TransactionFormPage() {
                     >{t}</Button>
                   ))}
                 </div>
+                <div className="h-4" />
               </div>
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Amount</Label>
-                <div className="flex items-center gap-1 rounded-lg border border-border/50 bg-background px-3">
-                  <span className="text-sm text-muted-foreground/50">{'\u20B9'}</span>
-                  <input type="number" step="0.01" placeholder="0.00" value={amount}
-                    onChange={e => setAmount(e.target.value)} required
-                    className="h-9 w-full bg-transparent font-heading text-lg font-bold tabular-nums outline-none placeholder:text-muted-foreground/20"
-                  />
-                </div>
+              <div>
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Amount *</Label>
+                <Input
+                  {...register('amount')}
+                  type="number"
+                  step="0.01"
+                  placeholder="0.00"
+                  className={cn('mt-1 h-9 rounded-lg text-sm font-heading font-bold tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none', errors.amount && 'border-destructive focus-visible:ring-destructive/30')}
+                />
+                <FieldError message={errors.amount?.message} />
               </div>
             </div>
 
             {/* Row 2: Description + Category */}
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div className="space-y-1">
-                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Description</Label>
-                <Input placeholder="What was this for?" value={name} onChange={e => setName(e.target.value)} required className="h-9 rounded-lg text-sm" />
+            <div className="grid items-start grid-cols-2 gap-3">
+              <div>
+                <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Description *</Label>
+                <Input
+                  {...register('name')}
+                  placeholder="What was this for?"
+                  className={cn('mt-1 h-9 rounded-lg text-sm', errors.name && 'border-destructive focus-visible:ring-destructive/30')}
+                />
+                <FieldError message={errors.name?.message} />
               </div>
-              <div className="space-y-1">
+              <div>
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Category</Label>
-                <Select value={category} onValueChange={v => v && setCategory(v)}>
-                  <SelectTrigger className="h-9 w-full rounded-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(c => (
-                      <SelectItem key={c.name} value={c.name}>
-                        <span className="mr-1.5 inline-block h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="mt-1">
+                  <Select value={category} onValueChange={v => v && setCategory(v)}>
+                    <SelectTrigger className="h-9 w-full rounded-lg">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categories.map(c => (
+                        <SelectItem key={c.name} value={c.name}>
+                          <span className="mr-1.5 inline-block h-2 w-2 rounded-full" style={{ backgroundColor: c.color }} />
+                          {c.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="h-4" />
               </div>
             </div>
 
-            {/* Row 3: Date + Payment + Note */}
-            <div className="grid gap-3 sm:grid-cols-3">
-              <div className="space-y-1">
+            {/* Row 3: Date + Payment Mode + Note */}
+            <div className="grid items-start grid-cols-3 gap-3">
+              <div>
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Date</Label>
-                <DatePicker date={date} onChange={setDate} className="h-9" />
+                <div className="mt-1">
+                  <DatePicker date={date} onChange={setDate} className="h-9 w-full" />
+                </div>
               </div>
-              <div className="space-y-1">
+              <div>
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Payment Mode</Label>
-                <Select value={paymentMode} onValueChange={v => v && setPaymentMode(v)}>
-                  <SelectTrigger className="h-9 w-full rounded-lg">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {PAYMENT_MODES.map(mode => (
-                      <SelectItem key={mode} value={mode}>{mode}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="mt-1">
+                  <Select value={paymentMode} onValueChange={v => v && setPaymentMode(v)}>
+                    <SelectTrigger className="h-9 w-full rounded-lg">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {PAYMENT_MODES.map(mode => (
+                        <SelectItem key={mode} value={mode}>{mode}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              <div className="space-y-1">
+              <div>
                 <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Note</Label>
-                <Input placeholder="Optional" value={note} onChange={e => setNote(e.target.value)} className="h-9 rounded-lg text-sm" />
+                <Input {...register('note')} placeholder="Optional" className="mt-1 h-9 rounded-lg text-sm" />
               </div>
             </div>
 
-            {/* Submit */}
-            <div className="flex justify-end pt-1">
-              <Button type="button" variant="outline" size="sm" className="mr-2 h-9 rounded-lg" onClick={() => navigate(-1)}>Cancel</Button>
-              <Button type="submit" size="sm" disabled={loading} className="h-9 rounded-lg bg-brand px-6 font-semibold hover:bg-brand-light">
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" variant="outline" onClick={() => navigate(-1)}>Cancel</Button>
+              <Button type="submit" disabled={loading} className="bg-brand px-6 hover:bg-brand-light">
                 {loading && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}
                 Add Transaction
               </Button>

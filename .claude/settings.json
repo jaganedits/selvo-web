@@ -12,6 +12,9 @@
       "Bash(npx shadcn@latest add calendar popover --overwrite -y)",
       "Bash(npx shadcn@latest add table -y)",
       "Bash(gh auth:*)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\leite\\Downloads"
     ]
   }
 }

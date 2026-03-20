@@ -16,22 +16,36 @@ interface FirebaseConfigFormProps {
 
 function parseFirebaseConfig(text: string): UserFirebaseConfig | null {
   try {
-    // Try parsing as JSON directly (google-services.json web config)
     const parsed = JSON.parse(text)
 
-    // If it has firebaseConfig or config key
-    const cfg = parsed.firebaseConfig ?? parsed.config ?? parsed
-
-    // Extract fields — handle both Firebase console format and raw JSON
-    return {
-      apiKey: cfg.apiKey ?? cfg.api_key ?? '',
-      projectId: cfg.projectId ?? cfg.project_id ?? '',
-      appId: cfg.appId ?? cfg.app_id ?? '',
-      storageBucket: cfg.storageBucket ?? cfg.storage_bucket ?? '',
-      messagingSenderId: cfg.messagingSenderId ?? cfg.messaging_sender_id ?? cfg.messagingSenderId ?? '',
+    // Format 1: Android google-services.json
+    if (parsed.project_info && parsed.client) {
+      const projectInfo = parsed.project_info
+      const client = parsed.client[0]
+      return {
+        apiKey: client?.api_key?.[0]?.current_key ?? '',
+        projectId: projectInfo.project_id ?? '',
+        appId: client?.client_info?.mobilesdk_app_id ?? '',
+        storageBucket: projectInfo.storage_bucket ?? '',
+        messagingSenderId: projectInfo.project_number ?? '',
+      }
     }
+
+    // Format 2: Web config object (direct or nested)
+    const cfg = parsed.firebaseConfig ?? parsed.config ?? parsed
+    if (cfg.apiKey || cfg.api_key) {
+      return {
+        apiKey: cfg.apiKey ?? cfg.api_key ?? '',
+        projectId: cfg.projectId ?? cfg.project_id ?? '',
+        appId: cfg.appId ?? cfg.app_id ?? '',
+        storageBucket: cfg.storageBucket ?? cfg.storage_bucket ?? '',
+        messagingSenderId: cfg.messagingSenderId ?? cfg.messaging_sender_id ?? '',
+      }
+    }
+
+    return null
   } catch {
-    // Try extracting from JS snippet like: const firebaseConfig = { apiKey: "...", ... }
+    // Format 3: JS snippet — const firebaseConfig = { apiKey: "...", ... }
     const apiKey = text.match(/apiKey:\s*["']([^"']+)["']/)?.[1] ?? ''
     const projectId = text.match(/projectId:\s*["']([^"']+)["']/)?.[1] ?? ''
     const appId = text.match(/appId:\s*["']([^"']+)["']/)?.[1] ?? ''
@@ -170,8 +184,8 @@ export function FirebaseConfigForm({ onValidate, onConnect, isProjectUsedCheck }
               <FileJson className="h-5 w-5 text-muted-foreground" />
             </div>
             <div>
-              <p className="text-[12px] font-semibold">Upload Firebase config JSON</p>
-              <p className="text-[10px] text-muted-foreground">google-services.json or exported config</p>
+              <p className="text-[12px] font-semibold">Upload Firebase config</p>
+              <p className="text-[10px] text-muted-foreground">google-services.json (Android) or web config JSON</p>
             </div>
           </button>
           {config.projectId && (
@@ -201,12 +215,12 @@ export function FirebaseConfigForm({ onValidate, onConnect, isProjectUsedCheck }
       {/* Actions */}
       <div className="flex gap-2 pt-1">
         {!validated ? (
-          <Button size="sm" className="h-8 flex-1 rounded-md bg-brand text-xs hover:bg-brand-light" onClick={handleValidate} disabled={validating || !config.apiKey}>
+          <Button size="sm" className="flex-1 bg-brand hover:bg-brand-light" onClick={handleValidate} disabled={validating || !config.apiKey}>
             {validating && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
             Test Connection
           </Button>
         ) : (
-          <Button size="sm" className="h-8 flex-1 rounded-md bg-brand text-xs hover:bg-brand-light" onClick={handleConnect} disabled={saving}>
+          <Button size="sm" className="flex-1 bg-brand hover:bg-brand-light" onClick={handleConnect} disabled={saving}>
             {saving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
             Save & Connect
           </Button>

@@ -51,8 +51,8 @@ export default function DashboardPage() {
     return (
       <div className="space-y-3">
         <div className="flex items-center justify-between"><Skeleton className="h-9 w-44" /><Skeleton className="h-9 w-52" /></div>
-        <div className="grid gap-3 md:grid-cols-3"><Skeleton className="h-24 rounded-xl" /><Skeleton className="h-24 rounded-xl" /><Skeleton className="h-24 rounded-xl" /></div>
-        <div className="grid gap-3 lg:grid-cols-3"><Skeleton className="h-80 rounded-xl lg:col-span-2" /><Skeleton className="h-80 rounded-xl" /></div>
+        <div className="grid gap-3 md:grid-cols-3"><Skeleton className="h-24 rounded-lg" /><Skeleton className="h-24 rounded-lg" /><Skeleton className="h-24 rounded-lg" /></div>
+        <div className="grid gap-3 lg:grid-cols-3"><Skeleton className="h-80 rounded-lg lg:col-span-2" /><Skeleton className="h-80 rounded-lg" /></div>
       </div>
     )
   }
@@ -67,7 +67,7 @@ export default function DashboardPage() {
         </div>
         <div className="flex items-center gap-2">
           <MonthPicker monthKey={monthKey} onChange={setMonthKey} />
-          <Button onClick={() => navigate(ROUTES.TRANSACTION_FORM)} size="sm" className="h-8 rounded-lg bg-brand text-xs hover:bg-brand-light">
+          <Button onClick={() => navigate(ROUTES.TRANSACTION_FORM)} size="sm" className="bg-brand hover:bg-brand-light">
             <Plus className="mr-1 h-3.5 w-3.5" />Add
           </Button>
         </div>
@@ -97,7 +97,7 @@ export default function DashboardPage() {
                   icon={<ReceiptText className="h-5 w-5 text-muted-foreground" />}
                   title="No transactions yet"
                   description="Start tracking your spending"
-                  action={<Button size="sm" className="rounded-xl bg-brand hover:bg-brand-light" onClick={() => navigate(ROUTES.TRANSACTION_FORM)}><Plus className="mr-1.5 h-3 w-3" />Add</Button>}
+                  action={<Button size="sm" className="bg-brand hover:bg-brand-light" onClick={() => navigate(ROUTES.TRANSACTION_FORM)}><Plus className="mr-1 h-3.5 w-3.5" />Add</Button>}
                 />
               </div>
             ) : (

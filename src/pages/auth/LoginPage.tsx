@@ -55,7 +55,7 @@ export default function LoginPage() {
           {/* Top — Logo */}
           <div className="animate-fade-up">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand">
                 <span className="font-heading text-xl font-extrabold tracking-tight">S</span>
               </div>
               <span className="font-heading text-2xl font-bold tracking-tight">Selvo</span>
@@ -98,7 +98,7 @@ export default function LoginPage() {
           {/* Mobile logo */}
           <div className="mb-10 lg:hidden">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand">
                 <span className="font-heading text-lg font-extrabold text-white">S</span>
               </div>
               <span className="font-heading text-xl font-bold">Selvo</span>
@@ -130,7 +130,7 @@ export default function LoginPage() {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 required
-                className="h-12 rounded-xl bg-secondary/50 border-0 px-4 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-brand/30 transition-all"
+                className="h-10 rounded-lg bg-secondary/50 border-0 px-4 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-brand/30 transition-all"
               />
             </div>
 
@@ -153,14 +153,15 @@ export default function LoginPage() {
                 value={password}
                 onChange={e => setPassword(e.target.value)}
                 required
-                className="h-12 rounded-xl bg-secondary/50 border-0 px-4 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-brand/30 transition-all"
+                className="h-10 rounded-lg bg-secondary/50 border-0 px-4 text-sm placeholder:text-muted-foreground/50 focus-visible:ring-2 focus-visible:ring-brand/30 transition-all"
               />
             </div>
 
             <Button
               type="submit"
               disabled={loading}
-              className="h-12 w-full rounded-xl bg-brand text-sm font-semibold tracking-wide hover:bg-brand-light transition-all duration-200 shadow-[0_1px_2px_rgba(207,69,0,0.3),0_4px_12px_rgba(207,69,0,0.15)]"
+              size="lg"
+              className="w-full bg-brand hover:bg-brand-light shadow-[0_1px_2px_rgba(207,69,0,0.3),0_4px_12px_rgba(207,69,0,0.15)]"
             >
               {loading ? (
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -184,7 +185,8 @@ export default function LoginPage() {
 
           <Button
             variant="outline"
-            className="h-12 w-full rounded-xl border-border/50 text-sm font-medium hover:bg-secondary/50 transition-all"
+            size="lg"
+            className="w-full"
             onClick={handleGoogle}
             disabled={googleLoading}
           >

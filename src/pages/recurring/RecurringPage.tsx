@@ -24,6 +24,7 @@ export default function RecurringPage() {
   const { recurring, loading } = useRecurring()
   const [dialogOpen, setDialogOpen] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [formError, setFormError] = useState('')
   const [form, setForm] = useState({
     type: 'expense' as 'expense' | 'income',
     amount: '',
@@ -33,9 +34,15 @@ export default function RecurringPage() {
     nextDate: new Date(),
   })
 
-  async function handleSubmit(e: FormEvent) {
+  function handleSubmit(e: FormEvent) {
     e.preventDefault()
-    if (!form.amount || !form.name) return
+    if (!form.amount || parseFloat(form.amount) <= 0) { setFormError('Amount is required'); return }
+    if (!form.name.trim()) { setFormError('Name is required'); return }
+    setFormError('')
+    doSave()
+  }
+
+  async function doSave() {
     setSaving(true)
     try {
       await addRecurring(db, uid, {
@@ -44,6 +51,7 @@ export default function RecurringPage() {
       })
       toast.success('Added')
       setDialogOpen(false)
+      setForm(f => ({ ...f, amount: '', name: '' }))
     } catch { toast.error('Failed') } finally { setSaving(false) }
   }
 
@@ -56,11 +64,12 @@ export default function RecurringPage() {
           <h1 className="font-heading text-lg font-extrabold tracking-tight">Recurring</h1>
           <p className="text-[12px] text-muted-foreground">{recurring.length} active</p>
         </div>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger><Button size="sm" className="h-8 rounded-lg bg-brand text-xs hover:bg-brand-light"><Plus className="mr-1 h-3.5 w-3.5" />Add</Button></DialogTrigger>
+        <Dialog open={dialogOpen} onOpenChange={o => { setDialogOpen(o); setFormError('') }}>
+          <DialogTrigger><Button size="sm" className="bg-brand hover:bg-brand-light"><Plus className="mr-1 h-3.5 w-3.5" />Add</Button></DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Add Recurring Transaction</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-3">
+              {formError && <p className="rounded-md bg-destructive/10 px-3 py-1.5 text-[11px] text-destructive">{formError}</p>}
               <div className="grid grid-cols-2 gap-1 rounded-lg bg-secondary/60 p-0.5">
                 {(['expense', 'income'] as const).map(t => (
                   <Button key={t} type="button" variant="ghost" size="sm"
@@ -70,34 +79,39 @@ export default function RecurringPage() {
                     )}>{t}</Button>
                 ))}
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Amount</Label>
-                  <Input type="number" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required className="h-9 rounded-lg" />
+              <div className="grid items-start grid-cols-2 gap-3">
+                <div>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Amount *</Label>
+                  <Input type="number" step="0.01" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))}
+                    className="mt-1 h-9 rounded-lg [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                 </div>
-                <div className="space-y-1">
-                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Name</Label>
-                  <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} required className="h-9 rounded-lg" />
+                <div>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Name *</Label>
+                  <Input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="mt-1 h-9 rounded-lg" />
                 </div>
               </div>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1">
+              <div className="grid items-start grid-cols-2 gap-3">
+                <div>
                   <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Frequency</Label>
-                  <Select value={form.frequency} onValueChange={v => v && setForm(f => ({ ...f, frequency: v }))}>
-                    <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <div className="mt-1">
+                    <Select value={form.frequency} onValueChange={v => v && setForm(f => ({ ...f, frequency: v }))}>
+                      <SelectTrigger className="h-9 w-full rounded-lg"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="daily">Daily</SelectItem>
+                        <SelectItem value="weekly">Weekly</SelectItem>
+                        <SelectItem value="monthly">Monthly</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div className="space-y-1">
+                <div>
                   <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Next Date</Label>
-                  <DatePicker date={form.nextDate} onChange={d => setForm(f => ({ ...f, nextDate: d }))} className="h-9" />
+                  <div className="mt-1">
+                    <DatePicker date={form.nextDate} onChange={d => setForm(f => ({ ...f, nextDate: d }))} className="h-9 w-full" />
+                  </div>
                 </div>
               </div>
-              <Button type="submit" size="sm" className="h-9 w-full rounded-lg bg-brand hover:bg-brand-light" disabled={saving}>
+              <Button type="submit" className="w-full bg-brand hover:bg-brand-light" disabled={saving}>
                 {saving && <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />}Add
               </Button>
             </form>

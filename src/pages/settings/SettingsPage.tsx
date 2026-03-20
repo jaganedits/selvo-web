@@ -114,7 +114,7 @@ export default function SettingsPage() {
                     <p className="text-[10px] text-muted-foreground capitalize">{theme}</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="h-7 rounded-md text-[11px]" onClick={toggleTheme}>{isDark ? 'Light' : 'Dark'}</Button>
+                <Button variant="outline" size="sm" className="" onClick={toggleTheme}>{isDark ? 'Light' : 'Dark'}</Button>
               </div>
               <div className="flex items-center justify-between px-3 py-2.5">
                 <div className="flex items-center gap-2.5">
@@ -124,7 +124,7 @@ export default function SettingsPage() {
                     <p className="text-[10px] text-muted-foreground">{transactions.length} transactions</p>
                   </div>
                 </div>
-                <Button variant="outline" size="sm" className="h-7 rounded-md text-[11px]" onClick={() => { exportTransactionsCSV(transactions); toast.success('Downloaded') }}>CSV</Button>
+                <Button variant="outline" size="sm" className="" onClick={() => { exportTransactionsCSV(transactions); toast.success('Downloaded') }}>CSV</Button>
               </div>
             </CardContent>
           </Card>
@@ -142,7 +142,7 @@ export default function SettingsPage() {
                 </div>
                 <Dialog open={configDialogOpen} onOpenChange={setConfigDialogOpen}>
                   <DialogTrigger>
-                    <Button variant="outline" size="sm" className="h-6 rounded-md text-[10px] px-2">
+                    <Button variant="outline" size="sm" className="">
                       <RefreshCw className="mr-1 h-3 w-3" />Change
                     </Button>
                   </DialogTrigger>
@@ -185,13 +185,13 @@ export default function SettingsPage() {
           <Card className="border-border/50 shadow-sm">
             <CardContent className="divide-y divide-border/30 p-0">
               <div className="p-3">
-                <Button variant="outline" size="sm" className="h-8 w-full rounded-md text-[12px]" onClick={() => signOut()}>
+                <Button variant="outline" size="sm" className="w-full" onClick={() => signOut()}>
                   <LogOut className="mr-1.5 h-3.5 w-3.5" />Sign Out
                 </Button>
               </div>
               <div className="p-3">
                 <p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-destructive/60">Danger</p>
-                <Button variant="destructive" size="sm" className="h-7 rounded-md text-[11px]" onClick={handleDeleteAccount} disabled={deleting}>
+                <Button variant="destructive" size="sm" className="" onClick={handleDeleteAccount} disabled={deleting}>
                   {deleting && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}<Trash2 className="mr-1 h-3 w-3" />Delete Account
                 </Button>
               </div>

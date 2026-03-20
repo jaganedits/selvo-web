@@ -63,7 +63,7 @@ export function AppSidebar() {
       <div className="px-3 py-2">
         <Button
           size="sm"
-          className="h-8 w-full rounded-lg bg-brand text-xs font-semibold hover:bg-brand-light"
+          className="w-full bg-brand hover:bg-brand-light"
           onClick={() => navigate(ROUTES.TRANSACTION_FORM)}
         >
           <Plus className="mr-1.5 h-3.5 w-3.5" />

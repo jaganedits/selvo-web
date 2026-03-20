@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card.tsx'
+import { Card, CardContent } from '@/components/ui/card.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Label } from '@/components/ui/label.tsx'
@@ -61,9 +61,9 @@ export default function BudgetsPage() {
   if (loading) {
     return (
       <div className="space-y-4">
-        <Skeleton className="h-9 w-48 rounded-xl" />
+        <Skeleton className="h-9 w-48 rounded-lg" />
         {Array.from({ length: 3 }).map((_, i) => (
-          <Skeleton key={i} className="h-28 rounded-xl" />
+          <Skeleton key={i} className="h-28 rounded-lg" />
         ))}
       </div>
     )
@@ -73,16 +73,15 @@ export default function BudgetsPage() {
     <div className="space-y-3 animate-fade-up">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="font-heading text-xl font-extrabold tracking-tight">Budgets</h1>
+          <h1 className="font-heading text-lg font-extrabold tracking-tight">Budgets</h1>
           <p className="mt-0.5 text-sm text-muted-foreground">{budgets.length} budgets set</p>
         </div>
         <div className="flex items-center gap-2">
           <MonthPicker monthKey={monthKey} onChange={setMonthKey} />
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger>
-              <Button size="sm" className="rounded-xl bg-brand hover:bg-brand-light">
-                <Plus className="mr-1.5 h-4 w-4" />
-                Set Budget
+              <Button size="sm" className="bg-brand hover:bg-brand-light">
+                <Plus className="mr-1 h-3.5 w-3.5" />Set Budget
               </Button>
             </DialogTrigger>
             <DialogContent>
@@ -91,9 +90,9 @@ export default function BudgetsPage() {
               </DialogHeader>
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70">Category</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Category</Label>
                   <Select value={budgetCategory} onValueChange={v => v && setBudgetCategory(v)}>
-                    <SelectTrigger className="h-11 w-full rounded-xl">
+                    <SelectTrigger className="h-9 w-full rounded-lg">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -104,17 +103,17 @@ export default function BudgetsPage() {
                   </Select>
                 </div>
                 <div className="space-y-1.5">
-                  <Label className="text-[11px] font-bold uppercase tracking-[0.12em] text-muted-foreground/70">Amount</Label>
+                  <Label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">Amount</Label>
                   <Input
                     type="number"
                     step="0.01"
                     placeholder="Budget amount"
                     value={budgetAmount}
                     onChange={e => setBudgetAmount(e.target.value)}
-                    className="h-11 rounded-xl"
+                    className="h-9 rounded-lg"
                   />
                 </div>
-                <Button onClick={handleSaveBudget} className="h-11 w-full rounded-xl bg-brand hover:bg-brand-light" disabled={saving}>
+                <Button onClick={handleSaveBudget} className="w-full bg-brand hover:bg-brand-light" disabled={saving}>
                   {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   Save Budget
                 </Button>
@@ -139,28 +138,24 @@ export default function BudgetsPage() {
             const catColor = DEFAULT_CATEGORY_MAP[b.category]?.color ?? '#95A5A6'
 
             return (
-              <Card key={b.category} className="border-border/50 shadow-sm" style={{ borderLeft: `3px solid ${catColor}` }}>
-                <CardHeader className="flex flex-row items-center justify-between p-4 pb-2">
-                  <CardTitle className="text-[13px] font-bold">{b.category}</CardTitle>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="h-7 w-7 text-muted-foreground hover:text-destructive hover:bg-destructive/5"
-                    onClick={() => handleDeleteBudget(b.category)}
-                  >
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
-                </CardHeader>
-                <CardContent className="px-4 pb-4">
+              <Card key={b.category} size="sm" className="border-border/50 shadow-sm" style={{ borderLeft: `3px solid ${catColor}` }}>
+                <CardContent className="flex flex-col gap-1 p-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[12px] font-bold">{b.category}</span>
+                    <Button variant="ghost" size="icon-sm"
+                      className="text-muted-foreground hover:text-destructive hover:bg-destructive/5"
+                      onClick={() => handleDeleteBudget(b.category)}
+                    ><Trash2 className="h-3 w-3" /></Button>
+                  </div>
                   <div className="flex items-end justify-between">
-                    <span className="font-heading text-lg font-extrabold tabular-nums">
+                    <span className="font-heading text-base font-extrabold tabular-nums">
                       {'\u20B9'}{formatIndianAmount(spent)}
                     </span>
                     <span className="text-xs font-medium tabular-nums text-muted-foreground">
                       of {'\u20B9'}{formatIndianAmount(b.amount)}
                     </span>
                   </div>
-                  <div className="mt-2.5 h-2 overflow-hidden rounded-full bg-secondary/80">
+                  <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-secondary/80">
                     <div
                       className="h-full rounded-full transition-all duration-700 ease-out"
                       style={{
